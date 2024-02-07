@@ -1,0 +1,209 @@
+#!/usr/bin/env python
+
+import sys
+import os
+import math
+
+def main():
+    # first grab the directory path from argv
+    path = sys.argv[1]
+
+    # save data in index directory
+    terms = save_terms(path)
+    docs = save_docs(path)
+    matrix = save_matrix(path, docs)
+
+    # grab input file contents
+    input_text = sys.stdin
+
+    query = make_query(input_text, terms)
+
+    compare(query, docs, matrix)
+
+    return 0
+
+
+def save_terms(directory):
+    """
+    save_terms:
+    saves all terms in sorted_terms.txt in given directory in a list
+
+    Parameters:
+    directory(str): the location of sorted_terms.txt
+
+    Returns:
+    terms(str[]) a list of sorted terms
+
+    """
+    path = os.path.join(directory, "sorted_terms.txt")
+    terms = []
+
+    with open(path, 'r') as file:
+        for line in file:
+            terms.append(line.strip())
+
+    return terms
+
+
+def save_docs(directory):
+    """
+    save_docs:
+    saves all file names in  in sorted_documents.txt in given directory in a list
+
+    Parameters:
+    directory(str): the location of sorted_documents.txt
+
+    Returns:
+    docs(str[]) a list of sorted file names
+
+    """
+    path = os.path.join(directory, "sorted_documents.txt")
+    docs = []
+
+    with open(path, 'r') as file:
+        for line in file:
+            docs.append(line.strip())
+
+    return docs
+
+
+def save_matrix(directory, docs):
+    """
+    save_matrix:
+    saves contents of td_matrix in a dictionary where each entry is a vector
+    for the given files
+
+    Paramters:
+    docs(str[]): a list of files being worked on
+    directory(str): the directory that td_matrix is in
+
+    Returns:
+    matrix{[]}: a dictionary containing the vectors for each file
+
+    """
+    path = os.path.join(directory, "td_matrix.txt")
+    matrix = {}
+
+    # create list for every doc in matrix
+    cur = 0
+    for doc in docs:
+        matrix[cur] = []
+        cur += 1
+
+    with open(path, 'r') as file:
+        next(file)  # skip dimensions of matrix.
+        for line in file:
+            freq_list = line.strip().split()
+            doc_index = 0
+            for freq in freq_list:
+                matrix[doc_index].append(freq_list[doc_index])
+                doc_index += 1
+    return matrix
+
+
+def make_query(text, terms):
+    """
+    make_query:
+    take an input text from query text file and will output a vector with a 1 for every
+    desired word to search for
+
+    Parameters:
+    text (str): input text from one of the query text files for assignment 6
+    terms (str[]): a list of all terms
+
+    Returns:
+    result (int[]): a query vector as described in the assignment description
+
+    """
+    query_dict = {}
+    result = []
+
+    # create a dict of words in query vector so long as term is in 'terms'
+    for line in text:
+        contents = line.strip().split()
+        if contents[0] in terms:
+            query_dict[contents[0]] = contents[1]
+        else:
+            continue
+
+    # now make the vector to compare
+    for term in terms:
+        if term in query_dict:
+            result.append(int(query_dict[term]))
+        else:
+            result.append(0)
+    return result
+
+
+def compare(query, docs, matrix):
+    """
+    compare:
+    compares the query vector to the vectors of all files being used
+
+    Parameters:
+    query: query vector from input query txt file made in make_query
+    docs: a list of files being worked on
+    matrix: a dict containing all text document vectors from input td-matrix
+
+    Returns:
+    prints contents as desired.
+    int 0
+
+    """
+    i = 0
+    cmp_dict = {}
+
+    for doc in docs:
+        vector = matrix[i]
+        cos = cosine(query, vector)
+        rounded_cos = "%.4f" % round(cos, 4)
+        cmp_dict[doc] = rounded_cos
+        i += 1
+
+    sort_name = sorted(cmp_dict.items(), reverse=True)
+    sorted_dict = sorted(sort_name, key=lambda x: x[1], reverse=True)
+
+    for num, fl in sorted_dict:
+        print("{} {}".format(fl, num))
+
+    return 0
+
+
+def cosine(list1, list2):
+    """
+    cosine:
+    compares 2 vectors using the cosine similarity
+
+    Parameters:
+    list1: first vector to be compared
+    list2: second vector
+
+    Returns:
+    the cosine similarity of list1 and list2
+    """
+    # find sum of all list1 and list2 entrants squared
+    list1_sum = 0
+    list2_sum = 0
+    for num1 in list1:
+        cur = int(num1) ** 2
+        list1_sum += cur
+    list1_sqrt = math.sqrt(list1_sum)
+
+    for num2 in list2:
+        cur = int(num2) ** 2
+        list2_sum += cur
+    list2_sqrt = math.sqrt(list2_sum)
+
+    # calculate the numerator
+    numerator = 0
+    i = 0
+    for num in list1:
+        product = int(num) * int(list2[i])
+        numerator += product
+        i += 1
+    denominator = list1_sqrt * list2_sqrt
+
+    return numerator / denominator
+
+if __name__ == "__main__":
+	main()
