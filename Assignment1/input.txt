@@ -1,0 +1,10 @@
+https://getbootstrap.com/docs/5.3/getting-started/introduction/
+https://getbootstrap.com/docs/5.3/assets/img/favicons/apple-touch-icon.png
+https://www.uvic.ca/ecs/computerscience/people/faculty/index.php
+https://www.uvic.ca/ecs/computerscience/people/faculty/profiles/bittencourt-roberto.php
+https://www.uvic.ca/ecs/computerscience/people/staff/index.php
+http://www.taco.com/
+http://www.taco.com/sysadmin.html
+http://www.taco.com/webhost.html
+http://www.taco.com/assets/images/autogen/Systems___and_Networks_Ntaco2big.gif
+http://www.taco.com/assets/images/autogen/Web___Hosting_Htaco2biga.gif

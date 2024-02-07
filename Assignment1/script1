@@ -1,0 +1,35 @@
+#!/bin/bash
+
+#this script takes argument 1 as the input file
+#to run use ./script1.sh inputfile.txt
+
+#script1's purpose is to remove all unwanted files from the directory paths in the passed input
+
+#create list of unwanted extensions
+extensions=("png","jpg","gif","mp3","mp4")
+
+while IFS= read -r line || [[ -n "$line" ]]
+do
+	#first a quick check if line is empty
+	if [[ -z "$line" ]]
+	then
+		continue
+	fi
+
+
+	#now process all full lines	
+	if [[ "${line: -1}" == "/" ]] #check if string ends in a file or is just a directory
+	then
+		echo "$line" >> files_removed.txt
+	else
+		file=$(basename "$line") #isolate file name
+		ext="${file##*.}" #isolate extension
+	
+		if echo "${extensions[@]}" | grep -q "$ext" #check if extension is in list
+		then
+			echo "${line%/*}/" >> files_removed.txt
+		else
+			echo "$line" >> files_removed.txt
+		fi
+	fi
+done < "$1"

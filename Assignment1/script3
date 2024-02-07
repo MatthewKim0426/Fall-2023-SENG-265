@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#to run this script type ./script3.sh
+#This script is reliant on the file output.txt and the directory 'webData' created by script2.sh
+
+#script3 will take all of the now formatted addresses from output.txt and create a directory hierarchy
+
+input="output.txt" #our input is the output.txt in this directory from script2.sh
+
+#read through input file
+while IFS= read -r line 
+do
+	if [[ "${line: -1}" == */ ]] # check if the last charcter in the line is a '/'
+	then
+		mkdir -p webData/"$line" #if yes then create the directory
+	else
+		mkdir -p webData/"${line%/*}" #if not then shave off the file name and create the directory
+	fi
+
+done < "$input"

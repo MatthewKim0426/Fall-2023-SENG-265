@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# to run script 4 type ./script4.sh
+#script 4 is reliant on directories and files files_removed.txt, output.txt, /webData created by subsequent scripts
+
+#input:
+#	urls: a txt document of urls to download
+#	directories: a formatted list of directories that corresponds to urls
+
+#script4 compares the two inputs and checks for the 3 cases described in the assignment 1 description and acts accordingly
+
+#credit: method for isolating file extension derived from https://stackabuse.com/how-to-check-if-string-contains-substring-in-bash/
+urls="./files_removed.txt"
+directories="./output.txt"
+
+web_extensions=("php","py","perl")
+
+
+while IFS= read -r url && IFS= read -r dir <&3
+do
+	#echo "URL: $url DIR: $dir" >> trace.txt
+	file_found=0 #bool to allow for early curl in some cases
+
+	#check if it is a web extension
+	file=$(basename "$url")
+	ext="${file##*.}"
+	if echo "${web_extensions[@]}" | grep -q "$ext"
+	then
+		outFile="${dir}.html"
+		file_found=1
+	#	echo "case 1 web extension, EXT: $ext, FILE=$file" >> trace.txt
+	fi
+	if [[ $file_found -eq 1 ]]
+	then
+		curl -o "webData/$outFile" "$url"
+		continue
+	fi
+
+		
+	#not a web extension, check if file end or directory end
+
+	if [[ ${dir: -1} == *"/" ]] # if is a directory
+	then
+		outFile="${dir}index.html"
+	#	echo "case 2 dir" >> trace.txt
+	else #else it is a txt or html file
+	#	echo "case 3 txt or html" >> trace.txt
+		outFile="${dir}"
+	fi
+	#now download
+	curl -o "webData/$outFile" "$url"
+
+done < "$urls" 3< "$directories"

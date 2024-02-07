@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#script 2 takes the input files and strips them of any http or https prefix
+
+#to run this script type ./script2.sh
+#NOTES: This script is dependant on files_removed.txt to be in the same folder as it
+# - files_removed is created by script 1 after passing it an input
+
+
+input="./files_removed.txt"
+
+while IFS= read -r line
+do
+	
+	#build up the directory we want, we will use sed command to remove https 
+	directory=$(echo "$line" | sed 's#https://##' | sed 's#http://##')
+
+ 	#output the directory paths to a new text file
+	echo "$directory" >> "./output.txt"
+
+
+done < "$input"
+
+#finally make the directory that will be used in scripts 3 and 4
+mkdir webData
