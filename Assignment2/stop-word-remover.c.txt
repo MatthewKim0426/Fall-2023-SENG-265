@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <strings.h>
+#include <string.h>
+
+/*
+ * main function of the code. Uses strtok to parse through the given text and print out any words that
+ * are not within the array of stop_words.
+ *
+ *input:
+ * int argc
+ * char *argv[]
+ *
+ * output:
+ * Prints out any text passed to the program from stdin with all stop words removed
+ */
+
+int main(int argc, char *argv[]) {
+
+    // Hardcoded list of stop words including possible punctuation
+    char *stop_words[9] = {"the", "a", "an", "of", "for", "to", "and", "but", "yet"};
+
+    // initialize var to store each line
+    char line[2000];
+
+    // initialize what we need for strtok parsing
+    char *space = " ";
+    char *token;
+    int is_stop_word = 0; // used to keep track of if current token is a stop word
+    int first; // used to see if token is first word of a line. to prevent spacing errors
+
+    while(fgets(line, sizeof(line), stdin)) {
+        first = 1;
+        token = strtok(line, space);
+
+        while(token != NULL) {
+            is_stop_word = 0;
+
+            for(int i = 0; i < 9; i++) {
+                if(strcmp(stop_words[i], token)==0) {
+                    is_stop_word = 1;
+                }
+            }
+
+            if (!is_stop_word) {
+                if (first) {
+                    printf("%s", token);
+                    first = 0 ;
+                } else {
+                    printf(" %s", token);
+                }
+            }
+
+            token = strtok(NULL, space);
+        }
+    }
+    return 0;
+}
