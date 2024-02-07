@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <ctype.h>
+
+/*
+ * Uses an int i and ctype.h to parse stdin character by character, and will output a cleaned version
+ * with no puctuation and capitals.
+ *
+ * to run:
+ * for a text file text.txt: compile this file and run ' cat text.txt | ./text-cleaner'
+ *
+ * input:
+ * stdin: through stdin passes text to be cleaned
+ *
+ * output:
+ * to stdout, prints the text now cleaned
+ */
+int main() {
+int i; //int to identify each char
+
+while ((i = getchar()) != EOF) {
+if (isalpha(i) || i ==  '\n' || (i >= '0' && i <= '9')) {
+putchar(tolower(i));
+} else if (i == ' ') {
+putchar(i);
+}
+}
+
+return 0;
+}
