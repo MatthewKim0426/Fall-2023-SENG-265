@@ -1,0 +1,133 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+'''
+sort_files
+takes an input directory and output path. Will print a sorted list of all files in directory to 
+output directory specified in path within a file called sorted_documents.txt/
+
+Parameters:
+directory (str): a valid directory path
+path (str): a valid directory path to output the file to
+Returns:
+int: 0
+'''
+def sort_files(directory, path):
+    file_names = os.listdir(directory)
+    files = sorted(file_names)
+
+    #print(files)
+    output_path = os.path.join(path, "sorted_documents.txt")
+
+    with open(output_path, 'w+') as file:
+        for name in files:
+            file.write(str(name) + '\n')
+
+    return 0
+
+
+'''
+sort_terms:
+creates a list of all terms within files in 'directory' and outputs a sorted
+list of all unique entries to a file sorted_terms.txt within the 'path' directory
+
+Parameters:
+Parameters:
+                directory (str): a valid directory path
+                path (str): a valid directory path to output the file to
+returns:
+output(str): a sorted list of all terms
+'''
+def sort_terms(directory, path):
+    file_names = os.listdir(directory)
+    output_path = os.path.join(path, "sorted_terms.txt")
+    term_list = []
+
+    for file_name in file_names:
+        cur_path = os.path.join(directory, file_name) #grab the current file directory
+
+        #read the file
+        terms = []
+        with open(cur_path, 'r') as file:
+            for line in file:
+                text = line.split()
+                terms.append(text[0])
+
+        for term in terms:
+            if term not in term_list:
+                term_list.append(term)
+
+    output = sorted(term_list)
+
+    #now print out our contents
+    with open(output_path, 'w+') as file:
+        for term in output:
+            file.write(str(term) + '\n')
+
+    return output
+
+
+'''
+create_matrix:
+creates a matrix of all entries for each word in given text files. Prints the dimensions of the matrix
+followd by the matrix itself to td_matrix.txt in 'path' directory
+
+        Parameters:
+                directory (str): a valid directory path
+                path (str): a valid directory path to output the file to
+words: a sorted list of all words
+        returns:
+int 0
+'''
+def create_matrix(directory, path, words):
+    files = os.listdir(directory)
+    file_names = sorted(files)
+    output_path = os.path.join(path, "td_matrix.txt")
+    matrix = {}
+
+    for word in words:
+        matrix[word] = []
+
+    for file_name in file_names:
+        cur_path = os.path.join(directory, file_name)
+        with open(cur_path, 'r') as file:
+            word_values = {word: 0 for word in words} #initialize a temp dict to store the values of the words
+            for line in file:
+                text = line.split()
+                if text[0] in words:
+                    word_values[text[0]] = int(text[1])
+            for word, value in word_values.items():
+                matrix[word].append(value)
+
+    #print the now populated matrix
+    first_line = "{} {}".format(len(matrix), len(file_names))
+
+    with open(output_path, 'w+') as file:
+        file.write(first_line)
+        file.write('\n')
+        for word in words: #print in desired order
+            value = matrix[word]
+            file.write(' '.join(map(str,value)) + '\n')
+
+    return 0
+
+def main():
+    #grab arguments from argv
+    directory = sys.argv[1]
+    output = sys.argv[2]
+
+    #ensure the output directory exists
+    if not os.path.exists(output):
+        os.makedirs(output)
+
+    #now call our 3 functions
+    sort_files(directory, output)
+    words = sort_terms(directory, output)
+    create_matrix(directory, output, words)
+
+    return 0
+
+if __name__ == "__main__":
+    main()
